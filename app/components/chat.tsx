@@ -7,7 +7,7 @@ import React, {
   useCallback,
   Fragment,
 } from "react";
-
+import * as sdk from "microsoft-cognitiveservices-speech-sdk";
 import SendWhiteIcon from "../icons/send-white.svg";
 import BrainIcon from "../icons/brain.svg";
 import RenameIcon from "../icons/rename.svg";
@@ -16,6 +16,7 @@ import ReturnIcon from "../icons/return.svg";
 import CopyIcon from "../icons/copy.svg";
 import LoadingIcon from "../icons/three-dots.svg";
 import PromptIcon from "../icons/prompt.svg";
+import MicrophoneIcon from "../icons/microphone.svg";
 import MaskIcon from "../icons/mask.svg";
 import MaxIcon from "../icons/max.svg";
 import MinIcon from "../icons/min.svg";
@@ -409,6 +410,7 @@ export function ChatActions(props: {
   showPromptModal: () => void;
   scrollToBottom: () => void;
   showPromptHints: () => void;
+  voiceInput: () => void;
   hitBottom: boolean;
 }) {
   const config = useAppConfig();
@@ -525,7 +527,11 @@ export function ChatActions(props: {
         text={currentModel}
         icon={<RobotIcon />}
       />
-
+      <ChatAction
+        onClick={props.voiceInput}
+        text={Locale.Chat.InputActions.VoiceInput}
+        icon={<MicrophoneIcon />}
+      />
       {showModelSelector && (
         <Selector
           defaultSelectedValue={currentModel}
@@ -1279,6 +1285,28 @@ function _Chat() {
             inputRef.current?.focus();
             setUserInput("/");
             onSearch("");
+          }}
+          voiceInput={() => {
+            const speechConfig = sdk.SpeechConfig.fromSubscription(
+              "ff9fbcba23be4b64ab383130bc0170f2",
+              "chinaeast2",
+            );
+            speechConfig.speechRecognitionLanguage = "zh-CN";
+            const audioConfig = sdk.AudioConfig.fromDefaultMicrophoneInput();
+            const recognizer = new sdk.SpeechRecognizer(
+              speechConfig,
+              audioConfig,
+            );
+            recognizer.recognizeOnceAsync(
+              (result) => {
+                setUserInput(result.text);
+                recognizer.close();
+              },
+              (err) => {
+                console.error(err);
+                recognizer.close();
+              },
+            );
           }}
         />
         <div className={styles["chat-input-panel-inner"]}>
