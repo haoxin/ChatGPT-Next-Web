@@ -1497,8 +1497,8 @@ function _Chat() {
           }}
           voiceInput={() => {
             const speechConfig = sdk.SpeechConfig.fromSubscription(
-              "ff9fbcba23be4b64ab383130bc0170f2",
-              "chinaeast2",
+              "",
+              "",
             );
             speechConfig.speechRecognitionLanguage = "zh-CN";
             const audioConfig = sdk.AudioConfig.fromDefaultMicrophoneInput();
